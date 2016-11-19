@@ -1,0 +1,27 @@
+{
+  "name": "any-fs",
+  "version": "0.1.0",
+  "description": "Abstract away any NodeJS fs-style object into a smarter interface",
+  "main": "source/index.js",
+  "scripts": {
+    "test": "nodeunit -r ./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/perry-mitchell/any-fs.git"
+  },
+  "keywords": [
+    "fs",
+    "filesystem",
+    "node"
+  ],
+  "author": "Perry Mitchell <perry@perrymitchell.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/perry-mitchell/any-fs/issues"
+  },
+  "homepage": "https://github.com/perry-mitchell/any-fs#readme",
+  "devDependencies": {
+    "nodeunit": "^0.10.2"
+  }
+}
