@@ -12,12 +12,13 @@ function __fsIsNative(fsInterface) {
 // Taken from: http://stackoverflow.com/a/9924463/966338
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 var ARGUMENT_NAMES = /([^\s,]+)/g;
-function getParamNames(func) {
-  var fnStr = func.toString().replace(STRIP_COMMENTS, '');
-  var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-  if(result === null)
-     result = [];
-  return result;
+function __getParameterNames(fn) {
+    let fnStr = fn.toString().replace(STRIP_COMMENTS, ''),
+        result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+    if (result === null) {
+        result = [];
+    }
+    return result;
 }
 
 /**
@@ -33,7 +34,7 @@ module.exports = function anyFS(fsInterface) {
 
         readDirectory: function readDirectory(dirPath, optionsOrEncoding) {
             let targetFn = fsInterface.readdir,
-                params = getParamNames(targetFn);
+                params = __getParameterNames(targetFn);
             let handler = function readdirCallback(resolve, reject, err, results) {
                 if (err) {
                     reject(err);
