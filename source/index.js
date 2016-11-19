@@ -1,3 +1,5 @@
+"use strict";
+
 const path = require("path");
 
 function __fsIsNative(fsInterface) {
@@ -10,8 +12,8 @@ function __fsIsNative(fsInterface) {
 }
 
 // Taken from: http://stackoverflow.com/a/9924463/966338
-var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-var ARGUMENT_NAMES = /([^\s,]+)/g;
+const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+const ARGUMENT_NAMES = /([^\s,]+)/g;
 function __getParameterNames(fn) {
     let fnStr = fn.toString().replace(STRIP_COMMENTS, ''),
         result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
@@ -75,7 +77,18 @@ module.exports = function anyFS(fsInterface) {
         },
 
         readFile: function readFile(filePath, optionsOrEncoding) {
-
+            return new Promise(function call_readFile(resolve, reject) {
+                let fn = (optionsOrEncoding) ?
+                        (cb) => fsInterface.readFile(filePath, optionsOrEncoding, cb) :
+                        (cb) => fsInterface.readFile(filePath, cb);
+                fn(function readFileCallback(err, data) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
         },
 
         stat: function stat(filePath) {
