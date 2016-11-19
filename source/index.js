@@ -1,9 +1,12 @@
 const path = require("path");
 
 function __fsIsNative(fsInterface) {
-    let readdir = fsInterface.readdir.toString();
-    // return /\[native code\]/.test(readdir);
-    return require("fs").readdir.toString() === readdir;
+    try {
+        let readdir = fsInterface.readdir.toString();
+        return require("fs").readdir.toString() === readdir;
+    } catch (err) {
+        return false;
+    }
 }
 
 // Taken from: http://stackoverflow.com/a/9924463/966338
