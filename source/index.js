@@ -10,7 +10,7 @@ const FS_WEBDAV = "webdav-fs";
 const TYPE_KEY = '@@fsType';
 
 function __fixWebDAVFs(fsInterface) {
-    let { readdir } = fsInterface;
+    let readdir = fsInterface.readdir;
     Object.assign(fsInterface, {
         readdir: (dirPath, mode, callback) => readdir(dirPath, callback, mode)
     });

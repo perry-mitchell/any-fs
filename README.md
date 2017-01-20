@@ -1,7 +1,7 @@
 # Any-fs
 Abstract away any filesystem (NodeJS) instance to a smarter interface
 
-[![Build Status](https://travis-ci.org/perry-mitchell/any-fs.svg?branch=master)](https://github.com/perry-mitchell/any-fs)
+[![Build Status](https://travis-ci.org/perry-mitchell/any-fs.svg?branch=master)](https://github.com/perry-mitchell/any-fs) ![node min version](https://img.shields.io/badge/node-%3E%3D%206.9-lightgrey.svg)
 
 ## Purpose
 Any-fs was designed to wrap filesystem interfaces like the following:
