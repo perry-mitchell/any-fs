@@ -70,6 +70,8 @@ Read the contents of a directory, returning a Promise with an array of stats (re
 
 > `options` may contain properties `mode` and `encoding` (`mode` being either `"node"` or `"stat"`), but it is essentially passed down into whatever fs interface is being wrapped.
 
+> `options` is not used for `readdir` in Node's 'fs' module.
+
 ### readFile(filePath[, options])
 Read the contents of a file, returning a Promise with a Buffer or string.
 

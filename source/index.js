@@ -101,20 +101,9 @@ module.exports = function anyFS(fsInterface) {
                 case FS_NATIVE:
                     /* falls-through */
                 default: {
-                    // return new Promise(function(resolve, reject) {
-                    //     fsInterface.readdir(dirPath, options, function(err, results) {
-                    //         if (err) {
-                    //             return reject(err);
-                    //         }
-                    //         if (options.mode === "stat") {
-                    //             return Promise
-                    //                 .all(results.map(item => adapter.stat(path.resolve(dirPath, item))))
-                    //                 .then(resolve, reject);
-                    //         }
-                    //         resolve(results);
-                    //     });
-                    // });
                     return promFs
+                        // no options, as Node v5.x.x and earlier didn't support it:
+                        //  https://nodejs.org/docs/v5.12.0/api/fs.html#fs_fs_readdir_path_callback
                         .readdir(dirPath)
                         .then(function(results) {
                             if (options.mode === "stat") {
