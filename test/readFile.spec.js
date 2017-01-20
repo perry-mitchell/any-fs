@@ -1,48 +1,52 @@
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
+const anyFs = require("../source/index.js");
 
-const anyFS = require("../source/index.js");
+const TEST_IMAGE = path.resolve(__dirname, "./resources/nodejs.png");
+const TEST_TEXT = path.resolve(__dirname, "./resources/test.txt");
 
-// TEST COMMENT
+describe("readFile", function() {
 
-module.exports = {
+    describe("using 'fs'", function() {
 
-    setUp: function(cb) {
-        this.fs = anyFS(fs);
-        this.testBuffer = new Buffer([1, 0, 5, 9, 2, 1, 7]);
-        fs.writeFileSync(path.resolve(__dirname, "./test.dat"), this.testBuffer);
-        cb();
-    },
+        beforeEach(function() {
+            this.fs = anyFs(fs);
+        });
 
-    tearDown: function(cb) {
-        fs.unlinkSync(path.resolve(__dirname, "./test.dat"));
-        cb();
-    },
-
-    text: {
-
-        "reads correctly": function(test) {
-            this.fs
-                .readFile(path.resolve(__dirname, "./readFile.spec.js"))
+        it("reads binary (default) files", function() {
+            return this.fs
+                .readFile(TEST_IMAGE)
                 .then(function(data) {
-                    test.ok(data.indexOf("// TEST COMMENT") >= 0, "File contents should be read correctly");
-                    test.done();
+                    expect(data).to.have.lengthOf(11471);
+                    expect(data).to.be.an.instanceOf(Buffer);
                 });
-        }
+        });
 
-    },
-
-    binary: {
-
-        "reads correctly": function(test) {
-            this.fs
-                .readFile(path.resolve(__dirname, "./test.dat"))
-                .then((data) => {
-                    test.ok(data.equals(this.testBuffer), "File contents should be read correctly");
-                    test.done();
+        it("reads binary files", function() {
+            return this.fs
+                .readFile(TEST_IMAGE, { encoding: null })
+                .then(function(data) {
+                    expect(data).to.have.lengthOf(11471);
+                    expect(data).to.be.an.instanceOf(Buffer);
                 });
-        }
+        });
 
-    }
+        it("reads text files", function() {
+            return this.fs
+                .readFile(TEST_TEXT, { encoding: "utf8" })
+                .then(function(data) {
+                    expect(data).to.equal("This is a test text file.")
+                });
+        });
 
-};
+        it("supports options as encoding string", function() {
+            return this.fs
+                .readFile(TEST_TEXT, "utf8")
+                .then(function(data) {
+                    expect(data).to.equal("This is a test text file.")
+                });
+        });
+
+    });
+
+});
