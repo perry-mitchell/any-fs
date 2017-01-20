@@ -101,19 +101,27 @@ module.exports = function anyFS(fsInterface) {
                 case FS_NATIVE:
                     /* falls-through */
                 default: {
-                    return new Promise(function(resolve, reject) {
-                        fsInterface.readdir(dirPath, options, function(err, results) {
-                            if (err) {
-                                return reject(err);
-                            }
+                    // return new Promise(function(resolve, reject) {
+                    //     fsInterface.readdir(dirPath, options, function(err, results) {
+                    //         if (err) {
+                    //             return reject(err);
+                    //         }
+                    //         if (options.mode === "stat") {
+                    //             return Promise
+                    //                 .all(results.map(item => adapter.stat(path.resolve(dirPath, item))))
+                    //                 .then(resolve, reject);
+                    //         }
+                    //         resolve(results);
+                    //     });
+                    // });
+                    return promFs
+                        .readdir(dirPath)
+                        .then(function(results) {
                             if (options.mode === "stat") {
-                                return Promise
-                                    .all(results.map(item => adapter.stat(path.resolve(dirPath, item))))
-                                    .then(resolve, reject);
+                                return Promise.all(results.map(item => adapter.stat(path.resolve(dirPath, item))));
                             }
-                            resolve(results);
+                            return results;
                         });
-                    });
                 }
             }
         },
