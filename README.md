@@ -66,6 +66,8 @@ Read the contents of a directory, returning a Promise with an array of stats (re
 | directoryPath   | `String`                  | The path to scan                                    |
 | options         | `String` or `Object`      | Encoding (string) or config options (object)        |
 
+> `options` may contain properties `mode` and `encoding` (`mode` being either `"node"` or `"stat"`), but it is essentially passed down into whatever fs interface is being wrapped.
+
 ### readFile(filePath[, options])
 Read the contents of a file, returning a Promise with a Buffer or string.
 
@@ -73,6 +75,8 @@ Read the contents of a file, returning a Promise with a Buffer or string.
 |-----------------|---------------------------|-----------------------------------------------------|
 | filePath        | `String`                  | The file to read                                    |
 | options         | `String` or `Object`      | Encoding (string) or config options (object)        |
+
+> `options.encoding` is set to `null` by default, returning the raw buffer. Use `"utf8"` to convert it to a UTF8 string.
 
 ### stat(filePath)
 Get statistics on a file or directory - returns a Promise with the stat object.

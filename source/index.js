@@ -113,6 +113,27 @@ module.exports = function anyFS(fsInterface) {
             }
         },
 
+        readFile: function(filePath, optionsOrEncoding) {
+            let defaultOptions = {
+                encoding: null
+            };
+            let options = (typeof optionsOrEncoding === "string") ?
+                Object.assign(defaultOptions, { encoding: optionsOrEncoding }) :
+                Object.assign(defaultOptions, optionsOrEncoding || {});
+            switch (fsType) {
+                case FS_WEBDAV:
+                    let encoding = (options.encoding === "utf8") ? "text" : "binary";
+                    return promFs.readFile(filePath, encoding);
+                case FS_DROPBOX:
+                    /* falls-through */
+                case FS_NATIVE:
+                    /* falls-through */
+                default: {
+                    return promFs.readFile(filePath, options);
+                }
+            }
+        },
+
         stat: function stat(filePath) {
             if (fsType === FS_NATIVE) {
                 return promFs.stat(filePath).then(res => __processStatOutput(filePath, res));
