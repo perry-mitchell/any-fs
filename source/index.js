@@ -1,6 +1,20 @@
 "use strict";
 
 const path = require("path");
+const pify = require("pify");
+
+const FS_NATIVE = "fs";
+const FS_DROPBOX = "dropbox-fs";
+const FS_WEBDAV = "webdav-fs";
+
+const TYPE_KEY = '@@fsType';
+
+function __fixWebDAVFs(fsInterface) {
+    let { readdir } = fsInterface;
+    Object.assign(fsInterface, {
+        readdir: (dirPath, mode, callback) => readdir(dirPath, callback, mode)
+    });
+}
 
 function __fsIsNative(fsInterface) {
     try {
@@ -11,16 +25,32 @@ function __fsIsNative(fsInterface) {
     }
 }
 
-// Taken from: http://stackoverflow.com/a/9924463/966338
-const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-const ARGUMENT_NAMES = /([^\s,]+)/g;
-function __getParameterNames(fn) {
-    let fnStr = fn.toString().replace(STRIP_COMMENTS, ''),
-        result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-    if (result === null) {
-        result = [];
+function __processStatOutput(filePath, result) {
+    let name = result.name || path.basename(filePath);
+    return {
+        name,
+        path: path.resolve(path.dirname(filePath), name),
+        isFile: () => result.isFile(),
+        isDirectory: () => result.isDirectory(),
+        size: result.size || 0
+    };
+}
+
+function __resolveFsType(fsInterface) {
+    if (fsInterface[TYPE_KEY]) {
+        switch(fsInterface[TYPE_KEY]) {
+            case FS_DROPBOX:
+                /* falls-through */
+            case FS_WEBDAV:
+                return fsInterface[TYPE_KEY];
+
+            default:
+                throw new Error(`Invalid type identifier: ${fsInterface[TYPE_KEY]}`);
+        }
+    } else if (__fsIsNative(fsInterface)) {
+        return FS_NATIVE;
     }
-    return result;
+    throw new Error("Unrecognised fs interface");
 }
 
 /**
@@ -31,78 +61,70 @@ function __getParameterNames(fn) {
  */
 
 module.exports = function anyFS(fsInterface) {
-
+    let fsType = __resolveFsType(fsInterface);
+    if (fsType === FS_WEBDAV) {
+        __fixWebDAVFs(fsInterface);
+    }
+    let promFs = pify(fsInterface);
     let adapter = {
 
         readDirectory: function readDirectory(dirPath, optionsOrEncoding) {
-            let targetFn = fsInterface.readdir,
-                params = __getParameterNames(targetFn);
-            let handler = function readdirCallback(resolve, reject, err, results) {
-                if (err) {
-                    reject(err);
-                } else {
-                    if (__fsIsNative(fsInterface)) {
-                        Promise
-                            .all(results.map(function(item) {
-                                return adapter.stat(path.resolve(dirPath, item));
-                            }))
-                            .then(resolve, reject);
-                    } else {
-                        resolve(results);
-                    }
-                }
+            let defaultOptions = {
+                encoding: "utf8",
+                mode: "stat"
             };
-            return new Promise(function call_readdir(resolve, reject) {
-                if (/^(opts|options)/i.test(params[1])) {
-                    // either node's fs or another interface that supports options
-                    let lastParam = params.pop();
-                    if (/^mode/i.test(lastParam)) {
-                        // using mode
-                        targetFn(dirPath, optionsOrEncoding, (err, results) => handler(resolve, reject, err, results), "stat");
-                    } else {
-                        // no mode param
-                        targetFn(dirPath, optionsOrEncoding, (err, results) => handler(resolve, reject, err, results));
-                    }
-                } else {
-                    let lastParam = params.pop();
-                    if (/^mode/i.test(lastParam)) {
-                        // using mode
-                        targetFn(dirPath, (err, results) => handler(resolve, reject, err, results), "stat");
-                    } else {
-                        // no mode param
-                        targetFn(dirPath, (err, results) => handler(resolve, reject, err, results));
-                    }
-                }
-            });
-        },
+            let options = (typeof optionsOrEncoding === "string") ?
+                Object.assign(defaultOptions, { encoding: optionsOrEncoding }) :
+                Object.assign(defaultOptions, optionsOrEncoding || {});
+            switch (fsType) {
+                case FS_WEBDAV:
+                    return promFs
+                        .readdir(dirPath, options.mode)
+                        .then(results => Promise.all(
+                            results.map(result => __processStatOutput(
+                                path.resolve(dirPath, result.name),
+                                result
+                            ))
+                        ));
 
-        readFile: function readFile(filePath, optionsOrEncoding) {
-            return new Promise(function call_readFile(resolve, reject) {
-                let fn = (optionsOrEncoding) ?
-                        (cb) => fsInterface.readFile(filePath, optionsOrEncoding, cb) :
-                        (cb) => fsInterface.readFile(filePath, cb);
-                fn(function readFileCallback(err, data) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(data);
-                    }
-                });
-            });
+                case FS_DROPBOX: {
+                    return promFs
+                        .readdir(dirPath, options)
+                        .then(results => Promise.all(
+                            results.map(result => __processStatOutput(
+                                path.resolve(dirPath, result.name),
+                                result
+                            ))
+                        ));
+                }
+
+                case FS_NATIVE:
+                    /* falls-through */
+                default: {
+                    return promFs
+                        .readdir(dirPath, options)
+                        .then(function(results) {
+                            if (options.mode === "stat") {
+                                return Promise.all(results.map(item => adapter.stat(path.resolve(dirPath, item))));
+                            }
+                            return results;
+                        });
+                }
+            }
         },
 
         stat: function stat(filePath) {
-            return new Promise(function call_stat(resolve, reject) {
+            if (fsType === FS_NATIVE) {
+                return promFs.stat(filePath).then(res => __processStatOutput(filePath, res));
+            }
+            return (new Promise(function call_stat(resolve, reject) {
                 fsInterface.stat(filePath, function statCallback(err, res) {
                     if (err) {
                         return reject(err);
                     }
-                    if (!res.name) {
-                        res.name = path.basename(filePath);
-                    }
                     resolve(res);
                 });
-            });
+            })).then(res => __processStatOutput(filePath, res));
         }
 
     };

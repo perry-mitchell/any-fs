@@ -6,7 +6,7 @@ Any-fs was designed to wrap filesystem interfaces like the following:
 
  * Node's [fs](https://nodejs.org/api/fs.html)
  * [WebDAV-fs](https://github.com/perry-mitchell/webdav-fs)
- * [Dropbox-fs](https://github.com/sallar/dropbox-fs)
+ * [Dropbox-fs](https://github.com/sallar/dropbox-fs) (v0.0.5 and up)
 
 Into a common interface that provides a more intuitive syntax. Any-fs is designed to blindly take any of these systems and return a common API.
 
