@@ -61,6 +61,11 @@ function __resolveFsType(fsInterface) {
  * @property {String} type Whether it is a "file" or "directory"
  */
 
+/**
+ * Create any-fs adapter
+ * @param {Object} fsInterface An interface object of another fs library
+ * @returns {Object} The any-fs adapter
+ */
 module.exports = function anyFS(fsInterface) {
     let fsType = __resolveFsType(fsInterface);
     if (fsType === FS_WEBDAV) {
