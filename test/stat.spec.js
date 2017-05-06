@@ -42,7 +42,7 @@ describe("stat", function() {
                 ])
                 .then(function(sizes) {
                     expect(sizes[0]).to.equal(11471);
-                    expect(sizes[1]).to.equal(136);
+                    expect(sizes[1]).to.be.within(1, 200);
                 });
         });
 
@@ -50,7 +50,7 @@ describe("stat", function() {
             return this.fs.stat(TEST_IMAGE).then(function(stat) {
                 expect(
                     (new Date(stat.mtime)).getTime()
-                ).to.equal(1494076047000);
+                ).to.be.within(1494076000000, 1494078000000);
             });
         });
 
