@@ -48,9 +48,7 @@ describe("stat", function() {
 
         it("returns file stat correct timestamp", function() {
             return this.fs.stat(TEST_IMAGE).then(function(stat) {
-                expect(
-                    (new Date(stat.mtime)).getTime()
-                ).to.be.within(1494076000000, 1494078000000);
+                expect((new Date(stat.mtime)).toUTCString()).to.equal("Sat, 06 May 2017 13:07:27 GMT");
             });
         });
 
