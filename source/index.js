@@ -33,7 +33,7 @@ function __processStatOutput(filePath, result) {
         isFile: () => result.isFile(),
         isDirectory: () => result.isDirectory(),
         size: result.size || 0,
-        mtime: result.mtime || 0
+        mtime: result.mtime || null
     };
 }
 
