@@ -32,7 +32,8 @@ function __processStatOutput(filePath, result) {
         path: path.resolve(path.dirname(filePath), name),
         isFile: () => result.isFile(),
         isDirectory: () => result.isDirectory(),
-        size: result.size || 0
+        size: result.size || 0,
+        mtime: result.mtime || null
     };
 }
 
