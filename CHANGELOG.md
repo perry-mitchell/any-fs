@@ -1,5 +1,10 @@
 # Any-fs Changelog
 
+## v0.3.0
+_2017-05-06_
+
+ * Add `mtime` to stat output
+
 ## v0.2.0
 _2017-01-20_
 
