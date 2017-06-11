@@ -75,11 +75,11 @@ module.exports = function anyFS(fsInterface) {
     let adapter = {
 
         readDirectory: function readDirectory(dirPath, optionsOrEncoding) {
-            let defaultOptions = {
+            const defaultOptions = {
                 encoding: "utf8",
                 mode: "stat"
             };
-            let options = (typeof optionsOrEncoding === "string") ?
+            const options = (typeof optionsOrEncoding === "string") ?
                 Object.assign(defaultOptions, { encoding: optionsOrEncoding }) :
                 Object.assign(defaultOptions, optionsOrEncoding || {});
             switch (fsType) {
@@ -154,6 +154,24 @@ module.exports = function anyFS(fsInterface) {
                     resolve(res);
                 });
             })).then(res => __processStatOutput(filePath, res));
+        },
+
+        writeFile: function writeFile(filePath, data, encoding) {
+            switch (fsType) {
+                case FS_WEBDAV:
+                    const webdavEncoding = (encoding && encoding === "utf8") ?
+                        "text" : "binary";
+                    return promFs.writeFile(filePath, data, webdavEncoding);
+                case FS_DROPBOX:
+                    /* falls-through */
+                case FS_NATIVE:
+                    /* falls-through */
+                default: {
+                    return encoding ?
+                        promFs.writeFile(filePath, data, encoding) :
+                        promFs.writeFile(filePath, data);
+                }
+            }
         }
 
     };
