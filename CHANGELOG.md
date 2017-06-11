@@ -1,5 +1,10 @@
 # Any-fs Changelog
 
+## v0.4.0
+_2017-06-11_
+
+ * Add `writeFile` method
+
 ## v0.3.0
 _2017-05-06_
 

@@ -4,6 +4,7 @@
   "description": "Abstract away any NodeJS fs-style object into a smarter interface",
   "main": "source/index.js",
   "scripts": {
+    "pub": "np",
     "test": "mocha -r test/index.js 'test/**/*.spec.js'"
   },
   "repository": {
@@ -24,6 +25,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
+    "np": "^2.16.0",
     "rimraf": "^2.6.1"
   },
   "dependencies": {
