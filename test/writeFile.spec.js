@@ -18,8 +18,8 @@ describe("writeFile", function() {
         });
 
         it("writes binary (default) files", function() {
-            const afs = this.fs;
-            let originalData;
+            var afs = this.fs,
+                originalData;
             return fileToBuffer(TEST_IMAGE)
                 .then(function(original) {
                     originalData = original;
