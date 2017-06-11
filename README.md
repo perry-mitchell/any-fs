@@ -88,3 +88,12 @@ Get statistics on a file or directory - returns a Promise with the stat object.
 | Parameter       | Type                      | Description                                         |
 |-----------------|---------------------------|-----------------------------------------------------|
 | filePath        | `String`                  | The file or directory to check                      |
+
+### writeFile(filePath, data[, encoding])
+Write data to a file - returns a Promise that resolves after writing has completed.
+
+| Parameter       | Type                      | Description                                         |
+|-----------------|---------------------------|-----------------------------------------------------|
+| filePath        | `String`                  | The file to write to                                |
+| data            | `Buffer` or `String`      | The data to write                                   |
+| encoding        | `String` or `undefined`   | The encoding to use for writing. `utf8` writes text.|
