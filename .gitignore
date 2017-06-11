@@ -4,6 +4,7 @@ npm-debug.log*
 pids
 *.pid
 *.seed
+*.bin
 coverage
 node_modules
 jspm_packages
