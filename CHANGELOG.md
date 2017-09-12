@@ -1,5 +1,10 @@
 # Any-fs Changelog
 
+## v0.4.1
+_2017-09-12_
+
+ * **Bugfix**: Dropbox writeFile called incorrectly
+
 ## v0.4.0
 _2017-06-11_
 
