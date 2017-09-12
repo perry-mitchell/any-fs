@@ -163,7 +163,9 @@ module.exports = function anyFS(fsInterface) {
                         "text" : "binary";
                     return promFs.writeFile(filePath, data, webdavEncoding);
                 case FS_DROPBOX:
-                    /* falls-through */
+                    return encoding ?
+                        promFs.writeFile(filePath, data, { encoding }) :
+                        promFs.writeFile(filePath, data);
                 case FS_NATIVE:
                     /* falls-through */
                 default: {
